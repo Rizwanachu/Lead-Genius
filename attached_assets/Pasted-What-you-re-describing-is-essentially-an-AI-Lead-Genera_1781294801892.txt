@@ -1,0 +1,464 @@
+What you're describing is essentially an **AI Lead Generation + Outreach Agency System**.
+
+The goal is:
+
+**Input:**
+
+* Country = USA
+* Niche = Cafe
+
+**Output:**
+
+* List of cafes without websites
+* Contact details collected
+* Personalized outreach sent automatically
+* Follow-ups handled
+* Meetings booked
+* Potential clients converted
+
+This is possible, but there are some important limitations:
+
+* Email sending is possible.
+* Social media outreach is partially possible.
+* WhatsApp automation is heavily restricted unless you use the official WhatsApp Business API.
+* Fully automatic client conversion is unrealistic. The AI can do 80-90% of the work, but closing deals usually requires human involvement.
+
+---
+
+# Architecture
+
+## Agent 1: Lead Finder
+
+User enters:
+
+```text
+Country: USA
+Business Type: Cafe
+```
+
+Agent searches:
+
+* Google Maps
+* Yelp
+* Facebook Pages
+* Instagram Business Profiles
+
+Extract:
+
+```text
+Business Name
+Location
+Phone
+Email
+Website
+Instagram
+Facebook
+```
+
+---
+
+## Agent 2: Website Detection
+
+Checks:
+
+```text
+Does business have website?
+```
+
+If:
+
+```text
+website = null
+```
+
+or
+
+```text
+facebook only
+```
+
+Move to next stage.
+
+Example:
+
+```text
+Joe's Cafe
+Instagram Only
+No Website
+```
+
+Potential lead.
+
+---
+
+## Agent 3: Lead Scoring
+
+Score every lead.
+
+Example:
+
+| Factor             | Points |
+| ------------------ | ------ |
+| No website         | +40    |
+| Has Instagram      | +20    |
+| Active business    | +20    |
+| Good reviews       | +10    |
+| Multiple locations | +10    |
+
+Score:
+
+```text
+0-100
+```
+
+Only contact:
+
+```text
+Score > 70
+```
+
+---
+
+## Agent 4: AI Website Audit
+
+AI analyzes:
+
+```text
+Instagram
+Facebook
+Google Maps
+```
+
+Generates:
+
+```text
+Business summary
+Problems
+Website opportunity
+```
+
+Example:
+
+```text
+Cafe has 400 reviews.
+No online ordering.
+No website.
+No booking page.
+
+Potential website value:
+High.
+```
+
+---
+
+## Agent 5: Personalized Outreach Writer
+
+Instead of:
+
+```text
+Hi sir need website?
+```
+
+Generate:
+
+```text
+Hi Sarah,
+
+I came across your cafe in Austin and noticed you have great reviews but don't currently have a website.
+
+Many customers search directly on Google before visiting.
+
+I made a few suggestions that could help increase online orders and visibility...
+```
+
+This should be AI-generated per business.
+
+Use:
+
+* OpenAI
+* Claude
+* Gemini
+
+---
+
+## Agent 6: Multi-Channel Outreach
+
+### Email
+
+Send through:
+
+* Resend
+* SendGrid
+* Mailgun
+
+Track:
+
+```text
+Opened?
+Clicked?
+Replied?
+```
+
+---
+
+### Instagram
+
+Not recommended to automate aggressively.
+
+Instead:
+
+* AI drafts message
+* Human approves
+* Send manually
+
+Instagram automation can get accounts restricted.
+
+---
+
+### Facebook
+
+Similar approach.
+
+AI drafts.
+Human sends.
+
+---
+
+### WhatsApp
+
+Use official:
+
+[WhatsApp Business Platform](https://business.whatsapp.com/products/platform?utm_source=chatgpt.com)
+
+Avoid unofficial bots.
+
+---
+
+# Agent 7: Follow-Up System
+
+If:
+
+```text
+No reply after 3 days
+```
+
+AI sends:
+
+```text
+Just wanted to follow up...
+```
+
+After:
+
+```text
+7 days
+```
+
+Another follow-up.
+
+Maximum:
+
+```text
+3-4 follow-ups
+```
+
+---
+
+# Agent 8: CRM
+
+Track:
+
+```text
+Lead Found
+Contacted
+Opened
+Replied
+Interested
+Meeting Booked
+Closed
+```
+
+Store in:
+
+* PostgreSQL
+* Supabase
+
+---
+
+# Agent 9: Proposal Generator
+
+If prospect replies:
+
+```text
+Interested
+```
+
+AI generates:
+
+```text
+Proposal PDF
+Pricing
+Timeline
+Website Mockup
+```
+
+Automatically.
+
+---
+
+# Recommended Replit Tech Stack
+
+Frontend:
+
+```text
+Next.js
+Tailwind
+```
+
+Backend:
+
+```text
+Python FastAPI
+```
+
+Database:
+
+```text
+Supabase
+```
+
+AI:
+
+```text
+OpenAI
+Gemini
+```
+
+Email:
+
+```text
+Resend
+```
+
+Automation:
+
+```text
+LangGraph
+```
+
+Scraping:
+
+```text
+Playwright
+```
+
+Queue:
+
+```text
+Upstash Redis
+```
+
+---
+
+# MVP Version (Build First)
+
+Don't build the full thing initially.
+
+Version 1:
+
+### Step 1
+
+Find businesses
+
+### Step 2
+
+Check website
+
+### Step 3
+
+Collect contacts
+
+### Step 4
+
+Generate personalized email
+
+### Step 5
+
+Send email
+
+### Step 6
+
+Track replies
+
+That's enough to start getting clients.
+
+---
+
+# Features I'd Include
+
+### Dashboard
+
+```text
+Search Leads
+```
+
+### Lead Finder
+
+```text
+Country
+State
+City
+Business Type
+```
+
+### Website Checker
+
+```text
+Website Found?
+Yes/No
+```
+
+### AI Analysis
+
+```text
+Opportunity Score
+```
+
+### Outreach Generator
+
+```text
+Email
+Instagram DM
+Facebook Message
+```
+
+### Campaign Manager
+
+```text
+Start Campaign
+Pause Campaign
+```
+
+### CRM
+
+```text
+Pipeline
+```
+
+### Analytics
+
+```text
+Emails Sent
+Open Rate
+Reply Rate
+Meetings Booked
+Revenue Generated
+```
+
+---
+
+A stronger business model than "website agency" would be:
+
+> Find businesses without websites → generate a website automatically with AI → include a live preview link in the first outreach email.
+
+That makes your offer much harder to ignore because you're showing the solution before they buy. For local cafes, salons, restaurants, gyms, dentists, and contractors, this approach often gets significantly better response rates than simply asking whether they need a website.

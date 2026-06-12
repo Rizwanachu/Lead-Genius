@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "LeadFlow AI"
+version = "1.0.0"
+id = "artifacts/lead-gen"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24107
+
+[services.development]
+run = "pnpm --filter @workspace/lead-gen run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/lead-gen", "run", "build" ]
+publicDir = "artifacts/lead-gen/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24107"
+BASE_PATH = "/"

@@ -3,13 +3,21 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: LeadFlow AI - Lead Generation & Outreach System
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: leads
+    description: Lead management
+  - name: campaigns
+    description: Campaign management
+  - name: outreach
+    description: Outreach messages
+  - name: analytics
+    description: Analytics and reporting
 paths:
   /healthz:
     get:
@@ -24,6 +32,430 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /leads:
+    get:
+      operationId: listLeads
+      tags: [leads]
+      summary: List leads
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [new, contacted, opened, replied, interested, meeting_booked, closed, disqualified]
+        - name: minScore
+          in: query
+          schema:
+            type: integer
+        - name: campaign_id
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: List of leads
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Lead"
+    post:
+      operationId: createLead
+      tags: [leads]
+      summary: Create a lead manually
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LeadInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lead"
+
+  /leads/search:
+    post:
+      operationId: searchLeads
+      tags: [leads]
+      summary: Trigger AI lead search by location and niche
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LeadSearchRequest"
+      responses:
+        "200":
+          description: Found leads
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Lead"
+
+  /leads/{id}:
+    get:
+      operationId: getLead
+      tags: [leads]
+      summary: Get a lead by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Lead detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lead"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateLead
+      tags: [leads]
+      summary: Update a lead
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LeadUpdate"
+      responses:
+        "200":
+          description: Updated lead
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lead"
+    delete:
+      operationId: deleteLead
+      tags: [leads]
+      summary: Delete a lead
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /leads/{id}/audit:
+    post:
+      operationId: auditLead
+      tags: [leads]
+      summary: Generate AI audit for a lead
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Audit result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LeadAudit"
+
+  /campaigns:
+    get:
+      operationId: listCampaigns
+      tags: [campaigns]
+      summary: List campaigns
+      responses:
+        "200":
+          description: List of campaigns
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Campaign"
+    post:
+      operationId: createCampaign
+      tags: [campaigns]
+      summary: Create a campaign
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CampaignInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Campaign"
+
+  /campaigns/{id}:
+    get:
+      operationId: getCampaign
+      tags: [campaigns]
+      summary: Get campaign by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Campaign
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Campaign"
+    patch:
+      operationId: updateCampaign
+      tags: [campaigns]
+      summary: Update campaign (including status)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CampaignUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Campaign"
+    delete:
+      operationId: deleteCampaign
+      tags: [campaigns]
+      summary: Delete a campaign
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /campaigns/{id}/leads:
+    get:
+      operationId: getCampaignLeads
+      tags: [campaigns]
+      summary: Get all leads in a campaign
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Leads in this campaign
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Lead"
+
+  /outreach:
+    get:
+      operationId: listOutreach
+      tags: [outreach]
+      summary: List outreach messages
+      parameters:
+        - name: lead_id
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: campaign_id
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [draft, sent, opened, clicked, replied, bounced]
+      responses:
+        "200":
+          description: List of outreach messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OutreachMessage"
+
+  /outreach/generate:
+    post:
+      operationId: generateOutreach
+      tags: [outreach]
+      summary: Generate AI-personalized outreach email for a lead
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OutreachGenerateRequest"
+      responses:
+        "200":
+          description: Generated outreach email
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OutreachMessage"
+
+  /outreach/send:
+    post:
+      operationId: sendOutreach
+      tags: [outreach]
+      summary: Send an outreach message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OutreachSendRequest"
+      responses:
+        "200":
+          description: Send result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OutreachMessage"
+
+  /outreach/{id}:
+    get:
+      operationId: getOutreach
+      tags: [outreach]
+      summary: Get outreach message by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Outreach message
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OutreachMessage"
+    patch:
+      operationId: updateOutreach
+      tags: [outreach]
+      summary: Update outreach message (edit draft)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OutreachUpdate"
+      responses:
+        "200":
+          description: Updated outreach
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OutreachMessage"
+
+  /analytics/overview:
+    get:
+      operationId: getAnalyticsOverview
+      tags: [analytics]
+      summary: Dashboard overview stats
+      responses:
+        "200":
+          description: Analytics overview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyticsOverview"
+
+  /analytics/pipeline:
+    get:
+      operationId: getPipelineStats
+      tags: [analytics]
+      summary: Lead pipeline counts by status
+      responses:
+        "200":
+          description: Pipeline breakdown
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PipelineStat"
+
+  /analytics/activity:
+    get:
+      operationId: getRecentActivity
+      tags: [analytics]
+      summary: Recent activity feed
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Recent activity items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityItem"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +466,399 @@ components:
       required:
         - status
 
+    Lead:
+      type: object
+      required:
+        - id
+        - businessName
+        - niche
+        - status
+        - score
+        - hasWebsite
+        - createdAt
+      properties:
+        id:
+          type: integer
+        businessName:
+          type: string
+        niche:
+          type: string
+        city:
+          type: ["string", "null"]
+        state:
+          type: ["string", "null"]
+        country:
+          type: ["string", "null"]
+        email:
+          type: ["string", "null"]
+        phone:
+          type: ["string", "null"]
+        website:
+          type: ["string", "null"]
+        instagramUrl:
+          type: ["string", "null"]
+        facebookUrl:
+          type: ["string", "null"]
+        googleMapsUrl:
+          type: ["string", "null"]
+        reviewCount:
+          type: ["integer", "null"]
+        reviewRating:
+          type: ["number", "null"]
+        hasWebsite:
+          type: boolean
+        score:
+          type: integer
+        status:
+          type: string
+          enum: [new, contacted, opened, replied, interested, meeting_booked, closed, disqualified]
+        notes:
+          type: ["string", "null"]
+        campaignId:
+          type: ["integer", "null"]
+        auditSummary:
+          type: ["string", "null"]
+        auditOpportunity:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: ["string", "null"]
+
+    LeadInput:
+      type: object
+      required:
+        - businessName
+        - niche
+      properties:
+        businessName:
+          type: string
+        niche:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        country:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        website:
+          type: string
+        instagramUrl:
+          type: string
+        facebookUrl:
+          type: string
+        googleMapsUrl:
+          type: string
+        reviewCount:
+          type: integer
+        reviewRating:
+          type: number
+        hasWebsite:
+          type: boolean
+        campaignId:
+          type: ["integer", "null"]
+        notes:
+          type: string
+
+    LeadUpdate:
+      type: object
+      properties:
+        businessName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        status:
+          type: string
+          enum: [new, contacted, opened, replied, interested, meeting_booked, closed, disqualified]
+        notes:
+          type: string
+        campaignId:
+          type: ["integer", "null"]
+        score:
+          type: integer
+
+    LeadSearchRequest:
+      type: object
+      required:
+        - niche
+        - country
+      properties:
+        niche:
+          type: string
+        country:
+          type: string
+        state:
+          type: string
+        city:
+          type: string
+        campaignId:
+          type: ["integer", "null"]
+
+    LeadAudit:
+      type: object
+      required:
+        - leadId
+        - summary
+        - problems
+        - opportunity
+        - score
+      properties:
+        leadId:
+          type: integer
+        summary:
+          type: string
+        problems:
+          type: array
+          items:
+            type: string
+        opportunity:
+          type: string
+        score:
+          type: integer
+
+    Campaign:
+      type: object
+      required:
+        - id
+        - name
+        - status
+        - niche
+        - country
+        - createdAt
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        niche:
+          type: string
+        country:
+          type: string
+        state:
+          type: ["string", "null"]
+        city:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [draft, active, paused, completed]
+        description:
+          type: ["string", "null"]
+        emailSubjectTemplate:
+          type: ["string", "null"]
+        emailBodyTemplate:
+          type: ["string", "null"]
+        maxFollowUps:
+          type: integer
+        followUpIntervalDays:
+          type: integer
+        leadCount:
+          type: integer
+        sentCount:
+          type: integer
+        openRate:
+          type: ["number", "null"]
+        replyRate:
+          type: ["number", "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: ["string", "null"]
+
+    CampaignInput:
+      type: object
+      required:
+        - name
+        - niche
+        - country
+      properties:
+        name:
+          type: string
+        niche:
+          type: string
+        country:
+          type: string
+        state:
+          type: string
+        city:
+          type: string
+        description:
+          type: string
+        emailSubjectTemplate:
+          type: string
+        emailBodyTemplate:
+          type: string
+        maxFollowUps:
+          type: integer
+          default: 3
+        followUpIntervalDays:
+          type: integer
+          default: 3
+
+    CampaignUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        status:
+          type: string
+          enum: [draft, active, paused, completed]
+        description:
+          type: string
+        emailSubjectTemplate:
+          type: string
+        emailBodyTemplate:
+          type: string
+        maxFollowUps:
+          type: integer
+        followUpIntervalDays:
+          type: integer
+
+    OutreachMessage:
+      type: object
+      required:
+        - id
+        - leadId
+        - subject
+        - body
+        - status
+        - channel
+        - createdAt
+      properties:
+        id:
+          type: integer
+        leadId:
+          type: integer
+        campaignId:
+          type: ["integer", "null"]
+        subject:
+          type: string
+        body:
+          type: string
+        status:
+          type: string
+          enum: [draft, sent, opened, clicked, replied, bounced]
+        channel:
+          type: string
+          enum: [email, instagram, facebook, whatsapp]
+        followUpNumber:
+          type: integer
+        sentAt:
+          type: ["string", "null"]
+        openedAt:
+          type: ["string", "null"]
+        repliedAt:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    OutreachGenerateRequest:
+      type: object
+      required:
+        - leadId
+      properties:
+        leadId:
+          type: integer
+        campaignId:
+          type: ["integer", "null"]
+        channel:
+          type: string
+          enum: [email, instagram, facebook, whatsapp]
+          default: email
+        followUpNumber:
+          type: integer
+          default: 0
+
+    OutreachSendRequest:
+      type: object
+      required:
+        - outreachId
+      properties:
+        outreachId:
+          type: integer
+
+    OutreachUpdate:
+      type: object
+      properties:
+        subject:
+          type: string
+        body:
+          type: string
+        status:
+          type: string
+          enum: [draft, sent, opened, clicked, replied, bounced]
+
+    AnalyticsOverview:
+      type: object
+      required:
+        - totalLeads
+        - totalContacted
+        - totalReplied
+        - totalMeetingsBooked
+        - totalCampaigns
+        - emailsSent
+        - openRate
+        - replyRate
+        - avgLeadScore
+        - leadsThisWeek
+      properties:
+        totalLeads:
+          type: integer
+        totalContacted:
+          type: integer
+        totalReplied:
+          type: integer
+        totalMeetingsBooked:
+          type: integer
+        totalCampaigns:
+          type: integer
+        emailsSent:
+          type: integer
+        openRate:
+          type: number
+        replyRate:
+          type: number
+        avgLeadScore:
+          type: number
+        leadsThisWeek:
+          type: integer
+
+    PipelineStat:
+      type: object
+      required:
+        - status
+        - count
+      properties:
+        status:
+          type: string
+        count:
+          type: integer
+        label:
+          type: string
+
+    ActivityItem:
+      type: object
+      required:
+        - id
+        - type
+        - description
+        - createdAt
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [lead_found, outreach_sent, email_opened, email_replied, meeting_booked, lead_closed]
+        description:
+          type: string
+        leadName:
+          type: ["string", "null"]
+        leadId:
+          type: ["integer", "null"]
+        createdAt:
+          type: string
