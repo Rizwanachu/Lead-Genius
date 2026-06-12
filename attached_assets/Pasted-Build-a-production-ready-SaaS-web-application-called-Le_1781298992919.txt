@@ -1,0 +1,294 @@
+Build a production-ready SaaS web application called "LeadHunter AI".
+
+GOAL:
+The application helps users find businesses that do not have websites, analyze them, generate personalized outreach messages, and manage outreach campaigns.
+
+IMPORTANT REQUIREMENTS:
+
+* Use Next.js 15 App Router
+* Use TypeScript
+* Use Tailwind CSS
+* Mobile-first responsive design
+* Dark/light mode
+* Vercel deployment friendly
+* No database
+* No authentication
+* No Supabase
+* No Firebase
+* No Prisma
+* No MongoDB
+* Store temporary data only in local state and browser localStorage
+* Clean modern SaaS UI
+* Fast loading
+* Modular architecture
+* Reusable components
+
+LAYOUT:
+
+Create:
+
+1. Responsive Sidebar
+2. Mobile Bottom Navigation
+3. Dashboard
+4. Lead Finder
+5. Lead Analyzer
+6. Outreach Generator
+7. Campaign Manager
+8. Settings
+
+DESIGN:
+
+* Modern AI SaaS style
+* Similar quality to Stripe, Linear, Notion, OpenAI dashboards
+* Rounded cards
+* Clean typography
+* Responsive on mobile, tablet, desktop
+* Loading skeletons
+* Toast notifications
+* Beautiful empty states
+
+---
+
+PAGE 1: DASHBOARD
+
+Show:
+
+* Total Leads
+* Leads Without Website
+* Emails Generated
+* Campaigns Created
+
+Use beautiful stat cards.
+
+---
+
+PAGE 2: LEAD FINDER
+
+Inputs:
+
+Country
+State
+City
+Business Type
+
+Examples:
+
+USA
+Texas
+Austin
+Cafe
+
+Search Button
+
+Display results table:
+
+Business Name
+Category
+Address
+Phone
+Website
+Email
+Instagram
+Facebook
+
+Add filters:
+
+* Has Website
+* No Website
+* Has Email
+* Has Social Media
+
+Add Export CSV button.
+
+---
+
+PAGE 3: WEBSITE DETECTOR
+
+Analyze selected lead.
+
+Checks:
+
+* Website exists
+* Website missing
+* Website looks outdated
+* Social media only
+
+Show:
+
+Opportunity Score (0-100)
+
+Color-coded badge:
+
+Green
+Yellow
+Red
+
+Generate recommendations.
+
+---
+
+PAGE 4: AI BUSINESS ANALYZER
+
+Input:
+
+Business Data
+
+Generate:
+
+* Business Summary
+* Website Opportunity
+* Local SEO Opportunity
+* Online Ordering Opportunity
+* Lead Score
+
+Display results in beautiful cards.
+
+---
+
+PAGE 5: OUTREACH GENERATOR
+
+Generate:
+
+1. Cold Email
+2. Instagram DM
+3. Facebook Message
+4. WhatsApp Message
+
+Tone options:
+
+* Friendly
+* Professional
+* Direct
+* Premium
+
+Length options:
+
+* Short
+* Medium
+* Long
+
+Output should be copyable.
+
+Include:
+
+Copy Button
+Regenerate Button
+
+---
+
+PAGE 6: CAMPAIGN MANAGER
+
+Create campaign.
+
+Fields:
+
+Campaign Name
+Business Type
+Location
+Message Type
+
+Show:
+
+Campaign Status
+Messages Generated
+Leads Targeted
+
+Store campaigns in localStorage.
+
+---
+
+PAGE 7: SETTINGS
+
+Fields:
+
+OpenAI API Key
+Gemini API Key
+Resend API Key
+
+Store securely in browser localStorage.
+
+Add:
+
+Test Connection Button
+
+---
+
+AI FEATURES
+
+Create utility functions for:
+
+generateLeadScore()
+
+generateBusinessAnalysis()
+
+generateColdEmail()
+
+generateInstagramDM()
+
+generateFacebookMessage()
+
+generateWhatsAppMessage()
+
+Use mock data if APIs are unavailable.
+
+---
+
+COMPONENTS
+
+Create reusable components:
+
+StatCard
+LeadTable
+SearchForm
+CampaignCard
+ScoreBadge
+AnalysisCard
+MessageGenerator
+Sidebar
+BottomNav
+Header
+ThemeToggle
+
+---
+
+RESPONSIVENESS
+
+Must work perfectly on:
+
+320px
+375px
+768px
+1024px
+1440px
+
+Mobile optimized.
+
+---
+
+VERCEL REQUIREMENTS
+
+* No server-side database
+* No filesystem storage
+* Environment variable ready
+* Edge compatible where possible
+* Build with npm run build successfully
+* No TypeScript errors
+* No lint errors
+
+---
+
+BONUS
+
+Add:
+
+* CSV Export
+* Lead Search History in localStorage
+* Campaign History in localStorage
+* Copy All Messages button
+* Dark Mode
+* Loading Animations
+* Empty States
+* Error Handling
+* Professional Landing Page
+
+Generate complete project structure, components, pages, utilities, types, hooks, and styling.
