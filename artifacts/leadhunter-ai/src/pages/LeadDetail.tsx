@@ -193,7 +193,11 @@ export default function LeadDetail() {
                 {lead.youtube && <Button variant="outline" size="icon" className="h-8 w-8 text-red-600 border-red-200 bg-red-50 hover:bg-red-100 dark:bg-red-950 dark:border-red-900"><Youtube className="w-4 h-4" /></Button>}
               </div>
               
-              <Button variant="outline" className="w-full gap-2" onClick={() => window.open(lead.googleMapsUrl, '_blank')}>
+              <Button variant="outline" className="w-full gap-2" onClick={() => {
+                // Always use name-based search — opens the real verified listing, not just coordinates
+                const q = [lead.businessName, lead.address, lead.city, lead.state, lead.country].filter(Boolean).join(", ");
+                window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`, '_blank');
+              }}>
                 <MapPin className="w-4 h-4" /> View on Google Maps
               </Button>
             </CardContent>
