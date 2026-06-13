@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { getLeads, Lead } from "@/lib/storage";
 import { toast } from "sonner";
-import { Printer, Copy, MessageCircle, FileText, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { Download, Copy, MessageCircle, FileText, ArrowLeft, CheckCircle2 } from "lucide-react";
 
 const PACKAGES = [
   { id: 'starter', name: 'Starter Website', description: 'Professional 5-page website', price: '$1,200 - $2,500' },
@@ -64,6 +64,134 @@ export default function ProposalGenerator() {
     toast.success("Proposal generated successfully!");
   };
 
+  const handleExportPDF = () => {
+    const selectedPackage = PACKAGES.find(p => p.id === formData.packageId) || PACKAGES[0];
+    const finalPrice = formData.customPrice || selectedPackage.price;
+    const refNum = `PRP-${Math.floor(Math.random() * 90000) + 10000}`;
+    const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Proposal — ${formData.businessName}</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Georgia,'Times New Roman',serif;color:#0f172a;background:#fff;padding:48px 64px;max-width:860px;margin:0 auto;font-size:15px;line-height:1.7}
+  h1{font-size:40px;font-weight:700;letter-spacing:-1px;color:#0f172a}
+  h2{font-size:18px;font-weight:700;color:#0f172a;border-left:4px solid #0f172a;padding-left:12px;margin-bottom:16px}
+  p{color:#475569;margin-bottom:10px}
+  ul{list-style:disc;padding-left:20px;color:#475569}
+  li{margin-bottom:8px}
+  .header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #e2e8f0;padding-bottom:32px;margin-bottom:40px}
+  .logo{width:56px;height:56px;background:#0f172a;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:18px;margin-bottom:16px;text-align:center;line-height:56px}
+  .agency-name{font-size:20px;font-weight:700;font-family:Georgia,serif}
+  .meta{text-align:right;font-family:Arial,sans-serif;font-size:13px;color:#64748b;line-height:1.8}
+  .meta strong{color:#0f172a;display:block;font-size:15px;margin-bottom:4px}
+  section{margin-bottom:40px}
+  .scope-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:24px;margin-top:16px;font-family:Arial,sans-serif}
+  .scope-box h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#94a3b8;margin-bottom:14px;font-family:Arial,sans-serif}
+  .scope-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;font-size:14px;color:#334155}
+  .check{color:#0f172a;font-size:16px;margin-top:1px}
+  table{width:100%;border-collapse:collapse;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0;font-family:Arial,sans-serif}
+  thead tr{background:#0f172a}
+  th{padding:14px 16px;color:#fff;font-size:13px;font-weight:600;text-align:left}
+  th:last-child{text-align:right}
+  td{padding:14px 16px;font-size:14px;color:#334155;border-bottom:1px solid #e2e8f0}
+  td:last-child{text-align:right}
+  .total-row td{background:#f8fafc;font-weight:700;font-size:14px;color:#0f172a}
+  .note{font-size:12px;color:#94a3b8;margin-top:10px;font-style:italic;font-family:Arial,sans-serif}
+  .cta{text-align:center;border-top:1px solid #e2e8f0;margin-top:50px;padding-top:40px}
+  .cta h3{font-size:24px;font-weight:700;color:#0f172a;margin-bottom:10px}
+  .cta p{color:#64748b;margin-bottom:24px}
+  .cta-box{display:inline-block;border:2px solid #0f172a;color:#0f172a;font-weight:700;padding:12px 36px;border-radius:8px;font-family:Arial,sans-serif;font-size:13px;letter-spacing:2px;text-transform:uppercase}
+  .expiry{font-size:11px;color:#94a3b8;margin-top:20px;text-transform:uppercase;letter-spacing:1.5px;font-family:Arial,sans-serif}
+  @media print{body{padding:32px 48px}@page{margin:0;size:A4}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <div class="logo">YA</div>
+    <div class="agency-name">Your Agency</div>
+    <h1 style="margin-top:20px">PROPOSAL</h1>
+    <p style="color:#64748b;font-family:Arial,sans-serif;font-size:14px;margin-top:4px">Prepared exclusively for ${formData.businessName}</p>
+  </div>
+  <div class="meta">
+    <strong>Your Agency</strong>
+    ${today}<br/>
+    Ref: #${refNum}<br/>
+    Valid for 14 days
+  </div>
+</div>
+
+<section>
+  <h2>Executive Summary</h2>
+  <p>Thank you for considering our team for your digital growth strategy. We specialize in helping ${formData.businessType.toLowerCase()}s in ${formData.city} expand their reach and increase revenue through highly optimized online experiences.</p>
+  <p>Based on our initial analysis of ${formData.businessName}, there is a significant opportunity to capture local market share currently being lost to competitors with stronger digital presence.</p>
+</section>
+
+<section>
+  <h2>The Opportunity Gap</h2>
+  <ul>
+    <li>Missing a modern, conversion-optimized online presence in ${formData.city}.</li>
+    <li>Losing local search traffic due to under-optimized ${formData.businessType} keywords.</li>
+    <li>No automated system to capture leads and bookings around the clock.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Our Solution: ${selectedPackage.name}</h2>
+  <p>${selectedPackage.description} — tailored specifically for ${formData.businessName} and the ${formData.city} market.</p>
+  <div class="scope-box">
+    <h3>Scope of Work</h3>
+    <div class="scope-item"><span class="check">✓</span><span>Full technical audit and discovery phase</span></div>
+    <div class="scope-item"><span class="check">✓</span><span>Custom design and development, mobile-first</span></div>
+    <div class="scope-item"><span class="check">✓</span><span>Speed optimization and core web vitals compliance</span></div>
+    <div class="scope-item"><span class="check">✓</span><span>Launch, handover, and training session included</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Investment</h2>
+  <table>
+    <thead><tr><th>Service</th><th>Investment</th></tr></thead>
+    <tbody>
+      <tr><td><strong>${selectedPackage.name}</strong></td><td>${finalPrice}</td></tr>
+      <tr><td>Setup &amp; Strategy Fee</td><td>Included</td></tr>
+      <tr class="total-row"><td>Total Estimate</td><td>${finalPrice}</td></tr>
+    </tbody>
+  </table>
+  <p class="note">Payment Terms: 50% required to commence work, 50% upon completion and launch.</p>
+</section>
+
+<section>
+  <h2>Timeline</h2>
+  <p>Estimated delivery: <strong>${formData.timeline}</strong> from contract signing and initial deposit.</p>
+</section>
+
+<div class="cta">
+  <h3>Ready to grow ${formData.businessName}?</h3>
+  <p>Let's build something great together.</p>
+  <div class="cta-box">Sign Proposal to Begin</div>
+  <p class="expiry">This proposal expires in 14 days · Ref: #${refNum}</p>
+</div>
+</body>
+</html>`;
+
+    const win = window.open('', '_blank', 'width=900,height=700');
+    if (!win) { toast.error('Allow popups to export PDF, then try again.'); return; }
+    win.document.write(html);
+    win.document.close();
+    win.addEventListener('load', () => {
+      setTimeout(() => {
+        win.focus();
+        win.print();
+      }, 300);
+    });
+    toast.success('PDF ready — use "Save as PDF" in the print dialog!');
+  };
+
   const selectedPackage = PACKAGES.find(p => p.id === formData.packageId) || PACKAGES[0];
   const finalPrice = formData.customPrice || selectedPackage.price;
 
@@ -87,8 +215,8 @@ export default function ProposalGenerator() {
             }}>
               <Copy className="w-4 h-4 mr-2" /> Share Link
             </Button>
-            <Button variant="outline" size="sm" onClick={() => window.print()}>
-              <Printer className="w-4 h-4 mr-2" /> Export PDF
+            <Button variant="outline" size="sm" onClick={handleExportPDF}>
+              <Download className="w-4 h-4 mr-2" /> Export PDF
             </Button>
             <Button size="sm" onClick={() => setLocation(formData.leadId !== 'manual' ? `/conversations?lead=${formData.leadId}` : '/conversations')}>
               <MessageCircle className="w-4 h-4 mr-2" /> Start Conversation
