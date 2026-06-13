@@ -2,17 +2,17 @@ import { Link, useLocation } from "wouter";
 import { 
   LayoutDashboard, 
   Search, 
-  Activity, 
-  MessageSquare, 
+  MessageCircle,
+  Wrench,
   FolderKanban
 } from "lucide-react";
 
 const navItems = [
   { href: "/", label: "Home", icon: LayoutDashboard },
   { href: "/leads", label: "Search", icon: Search },
-  { href: "/analyzer", label: "Analyze", icon: Activity },
-  { href: "/outreach", label: "Outreach", icon: MessageSquare },
+  { href: "/conversations", label: "Chat", icon: MessageCircle },
   { href: "/campaigns", label: "Campaigns", icon: FolderKanban },
+  { href: "/tools", label: "Tools", icon: Wrench },
 ];
 
 export default function BottomNav() {

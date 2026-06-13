@@ -1,3 +1,5 @@
+import { Lead } from "./storage";
+
 export const generateLeadScore = (hasWebsite: boolean): number => {
   return hasWebsite ? Math.floor(10 + Math.random() * 30) : Math.floor(60 + Math.random() * 30);
 };
@@ -26,4 +28,57 @@ export const generateFacebookMessage = (name: string, type: string, tone: string
 
 export const generateWhatsAppMessage = (name: string, type: string, tone: string, length: string) => {
   return `Hi ${name}, I hope you're doing well. I noticed your business doesn't have a website. I specialize in building sites for ${type}s and can help you get online fast. Let's chat!`;
+};
+
+export const generateConversationReply = (
+  leadName: string,
+  businessType: string,
+  channel: string,
+  conversationHistory: Array<{role: string, content: string}>,
+  prospectReply: string
+): { message: string, reasoning: string } => {
+  const replyLower = prospectReply.toLowerCase();
+  
+  if (replyLower.includes("not interested")) {
+    return {
+      message: `Totally understand! Just wanted to share that we recently helped another local ${businessType} double their leads by updating their site. If you ever change your mind, I'm here. Thanks for your time!`,
+      reasoning: "Tone: Professional — Re-engaging with social proof without being pushy."
+    };
+  } else if (replyLower.includes("how much") || replyLower.includes("price")) {
+    return {
+      message: `Our packages are tailored to what you actually need, but typically start around a few hundred dollars. I'd love to hop on a quick 5-min call to see what makes sense for ${leadName}. Do you have time tomorrow?`,
+      reasoning: "Tone: Helpful — Deflecting exact price to encourage a discovery call."
+    };
+  } else if (replyLower.includes("already have") || replyLower.includes("working with")) {
+    return {
+      message: `That's great you're already investing in your online presence! I'd be happy to do a free, no-obligation audit of your current setup to see if there's anything they might have missed. Let me know if that sounds useful!`,
+      reasoning: "Tone: Collaborative — Offering value (an audit) rather than immediately giving up."
+    };
+  } else if (replyLower.includes("busy") || replyLower.includes("timing")) {
+    return {
+      message: `No worries at all, I know running a ${businessType} keeps you incredibly busy. I'll check back in a couple of weeks. Have a great week!`,
+      reasoning: "Tone: Respectful — Planting a seed for a future follow-up."
+    };
+  } else if (replyLower.includes("more") || replyLower.includes("details")) {
+    return {
+      message: `Absolutely! Basically, we build professional, fast-loading websites that are optimized to show up on Google when people search for a ${businessType} in your area. Would you be open to a quick 10-minute call this week to see some examples?`,
+      reasoning: "Tone: Informative — Providing high-level value and asking for a call."
+    };
+  } else {
+    return {
+      message: `Thanks for getting back to me! Based on what I've seen with other ${businessType}s, a solid website can really help capture local traffic. Would you be open to a brief call this week to discuss how it could work for ${leadName}?`,
+      reasoning: "Tone: Friendly — Driving towards the call-to-action (booking a call)."
+    };
+  }
+};
+
+export const generateSalesPitcherBrief = (lead: Lead): string => {
+  const missingFeatures = [];
+  if (!lead.hasWebsite) missingFeatures.push("no website");
+  if (!lead.email) missingFeatures.push("no professional email");
+  if (!lead.instagram && !lead.facebook) missingFeatures.push("limited social media presence");
+  
+  const missingString = missingFeatures.length > 0 ? missingFeatures.join(", ") : "an outdated online presence";
+
+  return `${lead.businessName} has been operating since ${lead.yearEstablished} with ${lead.rating} stars but has ${missingString}. Their ${lead.reviewCount} Google reviews show customers love them, but they are likely losing potential traffic to competitors. You have a clear opening to offer digital marketing services tailored for a ${lead.category}.`;
 };

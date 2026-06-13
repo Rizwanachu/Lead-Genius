@@ -6,7 +6,9 @@ import {
   MessageSquare, 
   FolderKanban, 
   Settings,
-  Target
+  Target,
+  MessageCircle,
+  Wrench
 } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 
@@ -15,7 +17,9 @@ const navItems = [
   { href: "/leads", label: "Lead Finder", icon: Search },
   { href: "/analyzer", label: "Analyzer", icon: Activity },
   { href: "/outreach", label: "Outreach", icon: MessageSquare },
+  { href: "/conversations", label: "Conversations", icon: MessageCircle },
   { href: "/campaigns", label: "Campaigns", icon: FolderKanban },
+  { href: "/tools", label: "Marketing Tools", icon: Wrench },
 ];
 
 export default function Sidebar() {

@@ -2,13 +2,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Lead } from "@/lib/storage";
 import ScoreBadge from "./ScoreBadge";
-import { Globe, Mail, Instagram, Facebook } from "lucide-react";
+import { Globe, Mail, Instagram, Facebook, ArrowRight } from "lucide-react";
+import { useLocation } from "wouter";
+import { Button } from "./ui/button";
 
 interface LeadTableProps {
   leads: Lead[];
 }
 
 export default function LeadTable({ leads }: LeadTableProps) {
+  const [, setLocation] = useLocation();
   if (leads.length === 0) return null;
 
   return (
@@ -21,11 +24,17 @@ export default function LeadTable({ leads }: LeadTableProps) {
             <TableHead>Location</TableHead>
             <TableHead className="text-center">Opp Score</TableHead>
             <TableHead className="text-right">Digital Presence</TableHead>
+            <TableHead></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {leads.map((lead) => (
-            <TableRow key={lead.id}>
+            <TableRow 
+              key={lead.id} 
+              className="cursor-pointer hover:bg-muted/50 group transition-colors"
+              onClick={() => setLocation(`/leads/${lead.id}`)}
+              data-testid={`row-lead-${lead.id}`}
+            >
               <TableCell className="font-medium">{lead.businessName}</TableCell>
               <TableCell>
                 <Badge variant="secondary" className="font-normal capitalize">{lead.category}</Badge>
@@ -45,6 +54,11 @@ export default function LeadTable({ leads }: LeadTableProps) {
                   <Instagram className={`w-4 h-4 ${lead.instagram ? 'text-primary' : 'opacity-30'}`} />
                   <Facebook className={`w-4 h-4 ${lead.facebook ? 'text-primary' : 'opacity-30'}`} />
                 </div>
+              </TableCell>
+              <TableCell>
+                <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
+                  Details <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
               </TableCell>
             </TableRow>
           ))}
