@@ -92,6 +92,7 @@ export type Campaign = {
   location: string
   messageType: string
   status: 'draft' | 'active' | 'paused' | 'completed'
+  pipelineStatus?: 'new' | 'contacted' | 'interested' | 'call_booked' | 'proposal_sent' | 'won' | 'lost'
   messagesGenerated: number
   leadsTargeted: number
   createdAt: string

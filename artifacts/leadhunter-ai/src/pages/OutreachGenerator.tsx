@@ -4,11 +4,14 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import MessageGenerator from "@/components/MessageGenerator";
 import { getLeads, Lead, saveMessagesCount, getMessagesCount } from "@/lib/storage";
-import { generateColdEmail, generateInstagramDM, generateFacebookMessage, generateWhatsAppMessage } from "@/lib/aiUtils";
+import { generateColdEmail, generateInstagramDM, generateFacebookMessage, generateWhatsAppMessage, generateFollowUpSequence } from "@/lib/aiUtils";
 import { toast } from "sonner";
-import { Bot, Sparkles } from "lucide-react";
+import { Bot, Sparkles, Copy, Target } from "lucide-react";
 
 export default function OutreachGenerator() {
   const [savedLeads, setSavedLeads] = useState<Lead[]>([]);
@@ -25,6 +28,8 @@ export default function OutreachGenerator() {
 
   const [generatedMessage, setGeneratedMessage] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [followUpSequence, setFollowUpSequence] = useState<Array<{day: number, subject: string, content: string, sent?: boolean}>>([]);
+  const [isGeneratingSequence, setIsGeneratingSequence] = useState(false);
 
   useEffect(() => {
     setSavedLeads(getLeads());
@@ -74,13 +79,37 @@ export default function OutreachGenerator() {
       }
       
       setGeneratedMessage(msg);
-      
-      // Increment global counter
       saveMessagesCount(getMessagesCount() + 1);
-      
       setIsGenerating(false);
       toast.success("Message generated!");
     }, 1200);
+  };
+
+  const handleGenerateSequence = () => {
+    if (!formData.businessName || !formData.businessType) {
+      toast.error("Business name and type are required");
+      return;
+    }
+
+    setIsGeneratingSequence(true);
+    
+    setTimeout(() => {
+      const sequence = generateFollowUpSequence(formData.businessName, formData.businessType, formData.channel, generatedMessage);
+      setFollowUpSequence(sequence.map(s => ({...s, sent: false})));
+      setIsGeneratingSequence(false);
+      toast.success("Follow-up sequence generated!");
+    }, 1500);
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard!");
+  };
+
+  const toggleSent = (index: number) => {
+    const updated = [...followUpSequence];
+    updated[index].sent = !updated[index].sent;
+    setFollowUpSequence(updated);
   };
 
   return (
@@ -179,31 +208,88 @@ export default function OutreachGenerator() {
                 </div>
               </div>
 
-              <Button onClick={handleGenerate} disabled={isGenerating} className="w-full gap-2 text-primary-foreground">
-                <Sparkles className="w-4 h-4" />
-                {isGenerating ? "Crafting Message..." : "Generate AI Outreach"}
-              </Button>
             </CardContent>
           </Card>
         </div>
 
         <div className="lg:col-span-7">
-          <MessageGenerator 
-            message={generatedMessage} 
-            onRegenerate={handleGenerate} 
-            isGenerating={isGenerating} 
-          />
-          <div className="mt-6 p-4 rounded-lg bg-primary/5 border border-primary/10 text-sm text-muted-foreground flex items-start gap-3">
-            <Bot className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-            <p>Our AI models analyze the business type and tone to craft hyper-personalized outreach. We specifically emphasize the opportunity cost of not having a website to increase your response rates.</p>
-          </div>
+          <Tabs defaultValue="initial" className="w-full">
+            <TabsList className="w-full grid grid-cols-2 mb-6">
+              <TabsTrigger value="initial">Initial Outreach</TabsTrigger>
+              <TabsTrigger value="followup">Follow-Up Sequence</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="initial" className="space-y-6">
+              <Button onClick={handleGenerate} disabled={isGenerating} className="w-full gap-2 text-primary-foreground h-12 text-base">
+                <Sparkles className="w-4 h-4" />
+                {isGenerating ? "Crafting Message..." : "Generate AI Outreach"}
+              </Button>
+              <MessageGenerator 
+                message={generatedMessage} 
+                onRegenerate={handleGenerate} 
+                isGenerating={isGenerating} 
+              />
+              <div className="p-4 rounded-lg bg-primary/5 border border-primary/10 text-sm text-muted-foreground flex items-start gap-3">
+                <Bot className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                <p>Our AI models analyze the business type and tone to craft hyper-personalized outreach. We specifically emphasize the opportunity cost of not having a website to increase your response rates.</p>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="followup" className="space-y-6">
+              <Button onClick={handleGenerateSequence} disabled={isGeneratingSequence} className="w-full gap-2 text-primary-foreground h-12 text-base">
+                <Sparkles className="w-4 h-4" />
+                {isGeneratingSequence ? "Crafting Sequence..." : "Generate Full Sequence"}
+              </Button>
+
+              {followUpSequence.length > 0 ? (
+                <div className="space-y-4">
+                  {followUpSequence.map((msg, idx) => (
+                    <Card key={idx} className={`border-l-4 ${msg.sent ? 'border-l-emerald-500 opacity-70' : 'border-l-primary'} transition-all`}>
+                      <CardContent className="p-5">
+                        <div className="flex justify-between items-start mb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-sm bg-muted px-2 py-1 rounded">Day {msg.day}</span>
+                            <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{formData.channel}</span>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <Checkbox checked={msg.sent} onCheckedChange={() => toggleSent(idx)} />
+                              <span className="text-xs text-muted-foreground">Mark Sent</span>
+                            </label>
+                            <Button size="sm" variant="outline" className="h-8" onClick={() => copyToClipboard(formData.channel === 'email' ? `${msg.subject}\n\n${msg.content}` : msg.content)}>
+                              <Copy className="w-3.5 h-3.5 mr-2" /> Copy
+                            </Button>
+                          </div>
+                        </div>
+                        {formData.channel === 'email' && (
+                          <div className="mb-3 text-sm font-medium border-b pb-2">
+                            Subject: {msg.subject}
+                          </div>
+                        )}
+                        <Textarea 
+                          value={msg.content} 
+                          onChange={(e) => {
+                            const updated = [...followUpSequence];
+                            updated[idx].content = e.target.value;
+                            setFollowUpSequence(updated);
+                          }}
+                          className="min-h-[100px] border-none bg-muted/20 focus-visible:ring-0 resize-none shadow-none text-sm"
+                        />
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-12 text-center border border-dashed rounded-xl bg-muted/10">
+                  <Bot className="w-8 h-8 mx-auto text-muted-foreground mb-3 opacity-50" />
+                  <h3 className="font-medium text-lg mb-2">Automate your follow-ups</h3>
+                  <p className="text-sm text-muted-foreground max-w-sm mx-auto">Generate a 4-step sequence spaced over 30 days to ensure you never leave a prospect hanging.</p>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>
   );
-}
-
-// Quick component defined here just to make the icon work above
-function Target(props: any) {
-  return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
 }

@@ -82,3 +82,28 @@ export const generateSalesPitcherBrief = (lead: Lead): string => {
 
   return `${lead.businessName} has been operating since ${lead.yearEstablished} with ${lead.rating} stars but has ${missingString}. Their ${lead.reviewCount} Google reviews show customers love them, but they are likely losing potential traffic to competitors. You have a clear opening to offer digital marketing services tailored for a ${lead.category}.`;
 };
+
+export const generateRevenueOpportunity = (lead: Lead) => {
+  const visitors = lead.hasWebsite ? Math.floor(Math.random() * 200 + 100) : Math.floor(Math.random() * 500 + 300);
+  const revenue = visitors * 15;
+  const seo = Math.floor(Math.random() * 800 + 200);
+  const social = Math.floor(Math.random() * 1500 + 500);
+  
+  return { 
+    lostTraffic: `~${visitors} potential visitors/month missing`,
+    missedRevenue: `~$${revenue.toLocaleString()}/month in online revenue not captured`,
+    seoGap: `Competitors capturing ${seo}+ local searches you're missing`,
+    socialReach: `~${social.toLocaleString()} potential customers not reached monthly`,
+    totalOpportunity: revenue + (seo * 5),
+    agencyValue: Math.floor((revenue + (seo * 5)) * 0.1)
+  };
+};
+
+export const generateFollowUpSequence = (leadName: string, businessType: string, channel: string, initialMessage: string) => {
+  return [
+    { day: 3, subject: `Checking in - ${leadName}`, content: `Hi team, just checking you saw my last message about helping ${leadName} get online. Let me know if you have 5 mins to chat!` },
+    { day: 7, subject: `Quick win for ${leadName}`, content: `Hi again, I noticed a quick fix you could make to your Google Business profile that would help you show up higher for '${businessType}' searches. Happy to share it if you're interested.` },
+    { day: 14, subject: `How your competitors are getting traffic`, content: `I was doing some research and saw that other local ${businessType}s are capturing hundreds of searches a month just by having a simple booking website. We can set this up for you in a few days.` },
+    { day: 30, subject: `Final follow-up from me`, content: `I haven't heard back, so I'll stop reaching out for now. If ${leadName} ever needs help capturing more local online traffic, you know where to find me! Wishing you a great month ahead.` }
+  ];
+};

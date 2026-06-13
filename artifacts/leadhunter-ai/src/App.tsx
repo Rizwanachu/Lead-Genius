@@ -12,6 +12,8 @@ import Settings from "@/pages/Settings";
 import LeadDetail from "@/pages/LeadDetail";
 import Conversations from "@/pages/Conversations";
 import MarketingTools from "@/pages/MarketingTools";
+import ProposalGenerator from "@/pages/ProposalGenerator";
+import WebsiteMockup from "@/pages/WebsiteMockup";
 import AppLayout from "@/components/AppLayout";
 
 const queryClient = new QueryClient();
@@ -24,6 +26,8 @@ function Router() {
       <Route path="/leads/:id" component={LeadDetail} />
       <Route path="/analyzer" component={LeadAnalyzer} />
       <Route path="/outreach" component={OutreachGenerator} />
+      <Route path="/proposal" component={ProposalGenerator} />
+      <Route path="/mockup" component={WebsiteMockup} />
       <Route path="/campaigns" component={CampaignManager} />
       <Route path="/conversations" component={Conversations} />
       <Route path="/tools" component={MarketingTools} />

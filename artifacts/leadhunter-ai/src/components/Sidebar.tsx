@@ -8,7 +8,9 @@ import {
   Settings,
   Target,
   MessageCircle,
-  Wrench
+  Wrench,
+  FileText,
+  Monitor
 } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 
@@ -17,6 +19,8 @@ const navItems = [
   { href: "/leads", label: "Lead Finder", icon: Search },
   { href: "/analyzer", label: "Analyzer", icon: Activity },
   { href: "/outreach", label: "Outreach", icon: MessageSquare },
+  { href: "/proposal", label: "Proposal", icon: FileText },
+  { href: "/mockup", label: "Website Mockup", icon: Monitor },
   { href: "/conversations", label: "Conversations", icon: MessageCircle },
   { href: "/campaigns", label: "Campaigns", icon: FolderKanban },
   { href: "/tools", label: "Marketing Tools", icon: Wrench },

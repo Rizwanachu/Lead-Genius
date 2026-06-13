@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRoute, useLocation } from "wouter";
 import { getLeads, Lead } from "@/lib/storage";
-import { generateSalesPitcherBrief } from "@/lib/aiUtils";
+import { generateSalesPitcherBrief, generateRevenueOpportunity } from "@/lib/aiUtils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +11,7 @@ import ScoreBadge from "@/components/ScoreBadge";
 import { 
   MapPin, Phone, Globe, Mail, Instagram, Facebook, Twitter, 
   Youtube, Calendar, Users, Star, StarHalf, MessageCircle, 
-  ExternalLink, ArrowLeft, Printer, Play, Copy, CheckCircle2, ChevronRight, AlertCircle, FolderKanban
+  ExternalLink, ArrowLeft, Printer, Play, Copy, CheckCircle2, ChevronRight, AlertCircle, FolderKanban, TrendingUp, Search
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -78,6 +78,8 @@ export default function LeadDetail() {
     if (score >= 50) return "text-yellow-500 bg-yellow-500/10 border-yellow-500/20";
     return "text-destructive bg-destructive/10 border-destructive/20";
   };
+
+  const revenueOpportunity = generateRevenueOpportunity(lead);
 
   return (
     <div className="space-y-6 pb-20">
@@ -300,6 +302,63 @@ export default function LeadDetail() {
                   <span className="text-sm"><strong>Missed Revenue</strong> — Lack of direct online booking/ordering system forces customers to call or use expensive third-party apps.</span>
                 </li>
               </ul>
+            </CardContent>
+          </Card>
+
+          <Card className="border-emerald-500/20 bg-emerald-500/5 overflow-hidden relative">
+            <div className="absolute top-0 right-0 p-4 opacity-10">
+              <TrendingUp className="w-24 h-24 text-emerald-500" />
+            </div>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xl font-bold flex items-center gap-2">
+                Revenue Opportunity Estimate
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">Based on industry benchmarks</p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-3 relative z-10">
+                <div className="flex items-center gap-3 p-3 bg-background/50 rounded-lg border border-border/50">
+                  <div className="bg-orange-500/10 p-2 rounded-md"><Globe className="w-4 h-4 text-orange-500" /></div>
+                  <div className="flex-1">
+                    <div className="text-sm font-medium">Lost Web Traffic</div>
+                    <div className="text-xs text-muted-foreground">{revenueOpportunity.lostTraffic}</div>
+                  </div>
+                  <Badge variant="outline" className="text-orange-500 border-orange-500/30">High</Badge>
+                </div>
+                
+                <div className="flex items-center gap-3 p-3 bg-background/50 rounded-lg border border-border/50">
+                  <div className="bg-destructive/10 p-2 rounded-md"><TrendingUp className="w-4 h-4 text-destructive" /></div>
+                  <div className="flex-1">
+                    <div className="text-sm font-medium">Missed Bookings/Orders</div>
+                    <div className="text-xs text-muted-foreground">{revenueOpportunity.missedRevenue}</div>
+                  </div>
+                  <Badge variant="outline" className="text-destructive border-destructive/30">Critical</Badge>
+                </div>
+                
+                <div className="flex items-center gap-3 p-3 bg-background/50 rounded-lg border border-border/50">
+                  <div className="bg-blue-500/10 p-2 rounded-md"><Search className="w-4 h-4 text-blue-500" /></div>
+                  <div className="flex-1">
+                    <div className="text-sm font-medium">SEO Gap</div>
+                    <div className="text-xs text-muted-foreground">{revenueOpportunity.seoGap}</div>
+                  </div>
+                  <Badge variant="outline" className="text-blue-500 border-blue-500/30">Medium</Badge>
+                </div>
+                
+                <div className="flex items-center gap-3 p-3 bg-background/50 rounded-lg border border-border/50">
+                  <div className="bg-pink-500/10 p-2 rounded-md"><Users className="w-4 h-4 text-pink-500" /></div>
+                  <div className="flex-1">
+                    <div className="text-sm font-medium">Social Reach</div>
+                    <div className="text-xs text-muted-foreground">{revenueOpportunity.socialReach}</div>
+                  </div>
+                  <Badge variant="outline" className="text-pink-500 border-pink-500/30">Medium</Badge>
+                </div>
+              </div>
+              
+              <div className="mt-6 p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20 text-center relative z-10">
+                <div className="text-sm font-medium text-emerald-700 dark:text-emerald-400 mb-1">Total Opportunity Value:</div>
+                <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">~${revenueOpportunity.totalOpportunity.toLocaleString()}/month</div>
+                <p className="text-xs text-emerald-600/80 dark:text-emerald-400/80 font-medium">Helping this business capture just 10% = ${revenueOpportunity.agencyValue.toLocaleString()}/month for your agency</p>
+              </div>
             </CardContent>
           </Card>
 
