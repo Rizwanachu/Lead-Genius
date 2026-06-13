@@ -107,3 +107,158 @@ export const generateFollowUpSequence = (leadName: string, businessType: string,
     { day: 30, subject: `Final follow-up from me`, content: `I haven't heard back, so I'll stop reaching out for now. If ${leadName} ever needs help capturing more local online traffic, you know where to find me! Wishing you a great month ahead.` }
   ];
 };
+
+export const generateBattleCard = (lead: Lead) => {
+  const cat = (lead.category || '').toLowerCase();
+
+  let bestHook = '';
+  if ((lead.reviewCount || 0) > 100 && !lead.hasWebsite) {
+    bestHook = `You have ${lead.reviewCount} glowing reviews but no website — that means hundreds of customers found you on Google but had nowhere to go next.`;
+  } else if (!lead.hasWebsite) {
+    bestHook = `Every competitor in ${lead.city} showing up on Google right now has a website. Right now you're invisible to ~${lead.score || 70}% of people searching online.`;
+  } else {
+    bestHook = `Your site has significant SEO gaps — competitors are capturing searches for "${lead.category} in ${lead.city}" that should belong to you.`;
+  }
+
+  let bestOffer = '';
+  if (cat.includes('restaurant') || cat.includes('food') || cat.includes('cafe') || cat.includes('pizza')) {
+    bestOffer = '5-page website + online ordering system + Google Business optimization — fully delivered in 2 weeks.';
+  } else if (cat.includes('dentist') || cat.includes('doctor') || cat.includes('medical') || cat.includes('clinic')) {
+    bestOffer = 'Google Ads campaign targeting local high-intent patients + a dedicated booking landing page.';
+  } else if (cat.includes('gym') || cat.includes('fitness') || cat.includes('yoga')) {
+    bestOffer = 'Lead generation funnel + 30-day Reels content strategy — fill your classes without paid ads.';
+  } else if (cat.includes('clothing') || cat.includes('boutique') || cat.includes('fashion')) {
+    bestOffer = 'Shopify e-commerce store + Instagram ad campaign — sell nationwide, not just locally.';
+  } else {
+    bestOffer = 'Professional website + Local SEO package — appear in Google Maps top 3 within 60 days.';
+  }
+
+  const objectionPool = [
+    {
+      objection: '"I\'m already busy enough, I don\'t need more clients."',
+      response: `Exactly — a website automates your lead intake so you stop missing calls. It works while you work, and you control the flow.`
+    },
+    {
+      objection: '"I\'ve tried online marketing before, it didn\'t work."',
+      response: `Most failed campaigns target too broadly. We focus hyper-locally on people already searching for ${lead.category}s in ${lead.city} — high intent, ready to buy.`
+    },
+    {
+      objection: '"It\'s too expensive right now."',
+      response: `We offer flexible payment plans. The site pays for itself the moment it books a single new client — typically in week one.`
+    },
+    {
+      objection: '"My customers find me through word of mouth."',
+      response: `Word of mouth is gold, but what happens when their friend searches for you online and finds a competitor instead? Your reviews deserve a home.`
+    },
+  ];
+  const objection = objectionPool[Math.abs(Math.floor((lead.score || 65) * objectionPool.length / 100)) % objectionPool.length];
+
+  let tier = 'Starter';
+  let recommendedPrice = '$1,200 – $2,000';
+  const score = lead.score || 65;
+  if (score > 80) { tier = 'Agency Package'; recommendedPrice = '$3,500 – $5,000/mo'; }
+  else if (score > 60) { tier = 'Growth Bundle'; recommendedPrice = '$2,500 – $3,500'; }
+  else if (score > 40) { tier = 'Professional Site'; recommendedPrice = '$1,500 – $2,500'; }
+
+  const closeProbability = lead.hasWebsite
+    ? Math.min(45 + Math.floor(score / 5), 68)
+    : Math.min(55 + Math.floor(score / 4), 87);
+
+  return { bestHook, bestOffer, objection, recommendedPrice, tier, closeProbability };
+};
+
+export const generateOpportunityItems = (lead: Lead) => {
+  const items: { problem: string; action: string; rank: 'easy' | 'medium' | 'high'; effort: string; impact: string }[] = [];
+
+  if (!lead.hasWebsite) {
+    items.push({ problem: 'No website detected', action: 'Build a 5-page professional site with contact form', rank: 'high', effort: 'Easy Win', impact: 'Critical' });
+  }
+  items.push({ problem: 'Google Business Profile under-optimized', action: 'Claim, verify and fully optimize GBP listing', rank: 'easy', effort: 'Easy Win', impact: 'High' });
+  if (!lead.email) {
+    items.push({ problem: 'No professional email found', action: 'Set up professional email (e.g. info@business.com)', rank: 'easy', effort: 'Easy Win', impact: 'Medium' });
+  }
+  if ((lead.seoScore || 0) < 60) {
+    items.push({ problem: `Low SEO score (${lead.seoScore || 0}/100)`, action: 'Local keyword optimization + on-page SEO fixes', rank: 'medium', effort: 'Medium Win', impact: 'High' });
+  }
+  if (!lead.instagram || (lead.socialScore || 0) < 50) {
+    items.push({ problem: 'Weak or missing social media presence', action: 'Launch consistent content strategy + Reels posting', rank: 'medium', effort: 'Medium Win', impact: 'Medium' });
+  }
+  items.push({ problem: 'No online booking or contact form', action: 'Add a booking widget or Calendly integration', rank: 'easy', effort: 'Easy Win', impact: 'High' });
+  if ((lead.reviewCount || 0) < 50) {
+    items.push({ problem: `Only ${lead.reviewCount || 0} reviews — competitors have 200+`, action: 'Launch automated review collection via SMS/email', rank: 'medium', effort: 'Medium Win', impact: 'Medium' });
+  }
+  items.push({ problem: 'No lead capture funnel or email list', action: 'Build a lead magnet landing page + email sequence', rank: 'high', effort: 'High Value', impact: 'High' });
+  items.push({ problem: 'No paid traffic strategy in place', action: 'Launch targeted Google Ads or Meta Ads campaign', rank: 'high', effort: 'High Value', impact: 'Very High' });
+  if (!lead.hasWebsite) {
+    items.push({ problem: 'Missing call-to-action on all platforms', action: 'Add "Book Now" or "Call Us" buttons everywhere', rank: 'easy', effort: 'Easy Win', impact: 'Medium' });
+  }
+
+  return items.slice(0, 10);
+};
+
+export const generateServiceRecommendation = (lead: Lead) => {
+  const cat = (lead.category || '').toLowerCase();
+
+  let primary: { service: string; price: string; why: string }[] = [];
+  let secondary: string[] = [];
+  let avoid = '';
+  let pitch = '';
+
+  if (cat.includes('restaurant') || cat.includes('food') || cat.includes('cafe') || cat.includes('pizza') || cat.includes('bar') || cat.includes('diner')) {
+    primary = [
+      { service: 'Restaurant Website', price: '$1,200 – $2,000', why: 'Menu, hours, location — customers check online before visiting.' },
+      { service: 'Online Ordering System', price: '$600 – $900/mo', why: 'Cut 30% delivery app commissions. Own your orders.' },
+      { service: 'Local SEO', price: '$400 – $600/mo', why: 'Rank for "best [food type] near me" with high buyer intent.' },
+    ];
+    secondary = ['Instagram Reels Content Calendar', 'Google Review Automation', 'Google Business Profile Setup'];
+    avoid = 'LinkedIn Ads, B2B content marketing';
+    pitch = 'Lead with online ordering — framing it as saving them 30% in DoorDash fees makes the ROI immediately obvious. That message closes.';
+  } else if (cat.includes('dentist') || cat.includes('dental') || cat.includes('orthodont') || cat.includes('clinic') || cat.includes('doctor')) {
+    primary = [
+      { service: 'Google Ads (Local)', price: '$800 – $2,000/mo', why: 'People search "dentist near me" when in pain — high intent, ready to book.' },
+      { service: 'SEO + Local Content', price: '$600/mo', why: 'Rank for "family dentist in [city]" with long-term compound returns.' },
+      { service: 'Procedure Landing Pages', price: '$600 – $1,000', why: 'Dedicated pages for implants, whitening, Invisalign convert 3x better.' },
+    ];
+    secondary = ['Review Automation', 'Patient Referral Program', 'Before/After Gallery Page'];
+    avoid = 'TikTok, mass Instagram — wrong demographics for dental';
+    pitch = 'Lead with Google Ads. One new dental patient = $2,000–5,000 LTV. Ads at $1,500/mo that bring 3 new patients is an obvious win to any dentist.';
+  } else if (cat.includes('gym') || cat.includes('fitness') || cat.includes('yoga') || cat.includes('pilates') || cat.includes('crossfit')) {
+    primary = [
+      { service: 'Lead Generation Funnel', price: '$1,200 – $2,000', why: 'Free trial offer page + email drip that converts browsers into members.' },
+      { service: 'Reels Content Strategy', price: '$600 – $900/mo', why: 'Short-form workout videos organically fill class slots better than any ad.' },
+      { service: 'Facebook & Instagram Ads', price: '$600 – $1,500/mo', why: 'Hyperlocal targeting of fitness-interested people within 5 miles.' },
+    ];
+    secondary = ['Membership Pricing Page', 'Email Newsletter', 'Google Business Optimization'];
+    avoid = 'Google Ads — too expensive for gym LTV, broad intent mismatch';
+    pitch = 'Lead with Reels + free trial funnel. Show them a competitor gym doing this. Social proof sells fitness — people buy transformation, not features.';
+  } else if (cat.includes('clothing') || cat.includes('boutique') || cat.includes('fashion') || cat.includes('apparel') || cat.includes('shop')) {
+    primary = [
+      { service: 'Shopify E-commerce Store', price: '$2,000 – $4,000', why: 'Turn walk-in customers into 24/7 online revenue nationwide.' },
+      { service: 'Meta Ads (Facebook + Instagram)', price: '$800 – $2,000/mo', why: 'Clothing is visual — Instagram carousel and story ads convert extremely well.' },
+      { service: 'Content Creation Package', price: '$600 – $1,200/mo', why: 'UGC-style Reels drive organic traffic that compounds over time.' },
+    ];
+    secondary = ['TikTok Shop Integration', 'Email Newsletter', 'Influencer Gifting Strategy'];
+    avoid = 'Google Ads — low ROAS for clothing, broad intent';
+    pitch = 'Lead with Shopify. Every boutique dreams of selling beyond their city. Frame it as their store being open 24/7 to the entire country.';
+  } else {
+    primary = [
+      { service: 'Professional Website', price: '$1,200 – $2,500', why: lead.hasWebsite ? 'Modernize their outdated presence and improve conversion rate.' : 'Zero online credibility without one — it\'s table stakes.' },
+      { service: 'Local SEO Package', price: '$400 – $700/mo', why: `Capture "${lead.category} in ${lead.city}" searches — high intent, ready to hire.` },
+      { service: 'Google Business Optimization', price: '$300 – $500', why: 'Quick win — visible results in 30 days with minimal investment.' },
+    ];
+    secondary = ['Social Media Management', 'Email Marketing Setup', 'Google Ads (Phase 2)'];
+    avoid = 'Complex ad funnels before establishing baseline online presence';
+    pitch = `Start with website + GBP optimization. Build trust first with a quick win, then upsell SEO and ads once they see the results rolling in.`;
+  }
+
+  const callPrepQuestions = [
+    `How are most of your new customers currently finding you?`,
+    `Have you tried any online marketing before — what happened?`,
+    `What's your biggest challenge right now — getting new clients, or managing existing ones?`,
+    `If you could wave a magic wand, where would you want ${lead.businessName} to be in 12 months?`,
+    `Who is your main competitor in ${lead.city}, and what are they doing that you're not?`,
+    `What's a new customer worth to your business over their lifetime?`,
+  ];
+
+  return { primary, secondary, avoid, pitch, callPrepQuestions };
+};

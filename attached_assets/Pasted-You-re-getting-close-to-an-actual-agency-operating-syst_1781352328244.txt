@@ -1,0 +1,275 @@
+You're getting close to an actual agency operating system. At this point, I'd stop adding random features and focus on the few features that create the biggest jump in client acquisition.
+
+### What's still missing
+
+## 1. Real Lead Discovery Engine (Highest Priority)
+
+Right now it sounds like you have the sales and CRM side.
+
+What actually makes money is:
+
+```text
+Country
+State
+City
+Business Type
+↓
+Find Businesses
+↓
+Analyze
+↓
+Outreach
+```
+
+Add:
+
+* Google Maps search
+* Google Places API integration
+* CSV import
+* Bulk lead enrichment
+* Duplicate detection
+* Website detection
+
+Without this, the system is mostly operating on manually added leads.
+
+---
+
+## 2. AI Opportunity Scanner
+
+When opening a lead, add:
+
+```text
+Top 10 problems found
+```
+
+Examples:
+
+* No website
+* Website not mobile-friendly
+* Missing Google reviews strategy
+* No Instagram posting
+* Slow website
+* Missing call-to-action
+* No online booking
+
+Then rank:
+
+```text
+Easy Win
+Medium Win
+High Value Win
+```
+
+This gives you instant talking points.
+
+---
+
+## 3. Sales Battle Card
+
+For every lead generate:
+
+```text
+Best Hook
+Best Offer
+Likely Objection
+Recommended Price
+Close Probability
+```
+
+Example:
+
+```text
+Best Hook:
+You have 450 reviews but no online booking.
+
+Likely Objection:
+Already busy enough.
+
+Response:
+Focus on reducing missed calls and automating bookings.
+```
+
+This is gold during outreach.
+
+---
+
+## 4. AI Call Preparation Page
+
+Before a meeting:
+
+Generate:
+
+* Business summary
+* Owner profile
+* Competitor weaknesses
+* Questions to ask
+* Recommended offer
+* Pricing recommendation
+
+This makes you sound prepared even if you've never spoken to them before.
+
+---
+
+## 5. Service Recommendation Engine
+
+Instead of always selling websites.
+
+AI should decide:
+
+### Restaurant
+
+Sell:
+
+* Website
+* Online ordering
+* Local SEO
+
+### Dentist
+
+Sell:
+
+* Local SEO
+* Google Ads
+
+### Clothing Brand
+
+Sell:
+
+* Shopify
+* Meta Ads
+* Content creation
+
+### Gym
+
+Sell:
+
+* Lead generation funnel
+* Reels strategy
+
+This can dramatically increase close rates.
+
+---
+
+## 6. Client Fulfillment Workspace
+
+Once they become a client:
+
+Track:
+
+```text
+Client Onboarding
+Content Creation
+Website Build
+SEO
+Ads
+Reporting
+```
+
+Most agency systems stop at closing.
+
+The real value is managing delivery.
+
+---
+
+## 7. AI Website Generator
+
+This is the feature I'd build next.
+
+Workflow:
+
+```text
+Lead Found
+↓
+No Website
+↓
+Generate Demo Site
+↓
+Generate Share Link
+↓
+Include Link In Outreach
+```
+
+Imagine sending:
+
+> "I built a sample homepage for your business. Would you like to see it?"
+
+That's much stronger than:
+
+> "Do you need a website?"
+
+---
+
+## 8. Automated Proposal Intelligence
+
+Current proposal page is good.
+
+Add:
+
+### Dynamic pricing
+
+Based on:
+
+* Business type
+* Review count
+* Size
+* Location
+* Opportunity score
+
+Generate:
+
+```text
+Starter
+Growth
+Premium
+Agency
+```
+
+automatically.
+
+---
+
+## 9. Voice Notes & Call Logs
+
+Store:
+
+```text
+Meeting Notes
+Call Recording Link
+Next Follow-Up Date
+```
+
+This becomes important once you're talking to dozens of prospects.
+
+---
+
+## 10. Agency Dashboard
+
+The owner dashboard should answer:
+
+```text
+How many leads found?
+How many contacted?
+How many replied?
+How many meetings?
+How many proposals?
+How many closed?
+Revenue generated?
+```
+
+One screen.
+
+---
+
+## Version 3 Roadmap
+
+If I were building the next version, I'd prioritize:
+
+1. Real Google Maps Lead Discovery
+2. AI Website Generator
+3. Sales Battle Cards
+4. Call Preparation Dashboard
+5. Service Recommendation Engine
+6. Dynamic Proposal Pricing
+7. Agency Revenue Dashboard
+
+Those features move it from a nice CRM into a system that can actually help you acquire and close website, SEO, and social media clients consistently.
