@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { getLeads, Lead, saveMessagesCount, getMessagesCount } from "@/lib/storage";
-import { generateAllVariants, generateFollowUpSequence } from "@/lib/aiUtils";
+import { aiGenerateOutreach, aiGenerateFollowUpSequence } from "@/lib/gemini";
 import { toast } from "sonner";
 import { Bot, Sparkles, Copy, Target, CheckCircle2, RefreshCw, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -66,38 +66,53 @@ export default function OutreachGenerator() {
     }
   };
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!formData.businessName || !formData.businessType) {
       toast.error("Business name and type are required");
       return;
     }
     setIsGenerating(true);
     setVariants([]);
-    setTimeout(() => {
-      const msgs = generateAllVariants(
-        formData.businessName, formData.businessType, formData.location,
-        formData.channel, formData.tone, formData.length
+    try {
+      const msgs = await aiGenerateOutreach(
+        formData.businessName,
+        formData.businessType,
+        formData.location,
+        formData.channel as any,
+        formData.tone,
+        formData.length
       );
       setVariants(msgs);
       setSelectedVariant(0);
       saveMessagesCount(getMessagesCount() + 3);
+      toast.success("3 AI-generated variants ready — each is completely unique!");
+    } catch (err: any) {
+      toast.error("Generation failed: " + (err.message || "Unknown error"));
+    } finally {
       setIsGenerating(false);
-      toast.success("3 variants generated — pick your favorite!");
-    }, 1400);
+    }
   };
 
-  const handleGenerateSequence = () => {
+  const handleGenerateSequence = async () => {
     if (!formData.businessName || !formData.businessType) {
       toast.error("Business name and type are required");
       return;
     }
     setIsGeneratingSequence(true);
-    setTimeout(() => {
-      const seq = generateFollowUpSequence(formData.businessName, formData.businessType, formData.channel, variants[selectedVariant] || "");
+    try {
+      const seq = await aiGenerateFollowUpSequence(
+        formData.businessName,
+        formData.businessType,
+        formData.channel,
+        variants[selectedVariant] || ""
+      );
       setFollowUpSequence(seq.map(s => ({ ...s, sent: false })));
+      toast.success("AI follow-up sequence generated!");
+    } catch (err: any) {
+      toast.error("Failed: " + (err.message || "Unknown error"));
+    } finally {
       setIsGeneratingSequence(false);
-      toast.success("Follow-up sequence generated!");
-    }, 1500);
+    }
   };
 
   const copyToClipboard = (text: string, idx?: number) => {
@@ -121,11 +136,10 @@ export default function OutreachGenerator() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Outreach Generator</h1>
-        <p className="text-muted-foreground mt-1">Craft personalized, high-converting messages. Every generation gives you 3 unique variants to pick from.</p>
+        <p className="text-muted-foreground mt-1">Gemini AI writes 3 completely unique, personalized messages — no templates.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Config Panel */}
         <div className="lg:col-span-4 space-y-5">
           <Card className="bg-card/50 backdrop-blur-sm border-border/50">
             <CardContent className="p-6 space-y-5">
@@ -202,7 +216,6 @@ export default function OutreachGenerator() {
           </Card>
         </div>
 
-        {/* Right Output Panel */}
         <div className="lg:col-span-8">
           <Tabs defaultValue="initial" className="w-full">
             <TabsList className="w-full grid grid-cols-2 mb-5">
@@ -213,14 +226,13 @@ export default function OutreachGenerator() {
             <TabsContent value="initial" className="space-y-5">
               <Button onClick={handleGenerate} disabled={isGenerating} className="w-full gap-2 h-12 text-base font-semibold">
                 {isGenerating
-                  ? <><RefreshCw className="w-4 h-4 animate-spin" /> Generating 3 Variants...</>
+                  ? <><RefreshCw className="w-4 h-4 animate-spin" /> Gemini AI Writing 3 Unique Messages...</>
                   : <><Sparkles className="w-4 h-4" /> Generate AI Outreach (3 Variants)</>}
               </Button>
 
               <AnimatePresence>
                 {variants.length > 0 && (
                   <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-                    {/* Variant selector tabs */}
                     <div className="flex gap-2 items-center">
                       <span className="text-xs text-muted-foreground font-medium">Select a variant:</span>
                       {variants.map((_, i) => (
@@ -235,7 +247,6 @@ export default function OutreachGenerator() {
                       <span className="ml-auto text-xs text-muted-foreground capitalize">{channelLabel} · {formData.tone} · {formData.length}</span>
                     </div>
 
-                    {/* All 3 variants displayed as cards */}
                     {variants.map((msg, i) => (
                       <motion.div
                         key={i}
@@ -267,14 +278,13 @@ export default function OutreachGenerator() {
                           className="min-h-[100px] resize-none bg-transparent border-none focus-visible:ring-0 shadow-none text-sm p-0 cursor-pointer"
                           style={{ pointerEvents: 'none' }}
                         />
-                        {/* Character count */}
                         <p className="text-[10px] text-muted-foreground mt-2 text-right">{msg.length} chars</p>
                       </motion.div>
                     ))}
 
                     <div className="flex justify-between items-center pt-2">
                       <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-                        <Bot className="w-3.5 h-3.5" /> 3 unique variants generated — click to select, then copy to your CRM or outreach tool.
+                        <Bot className="w-3.5 h-3.5" /> Written by Gemini AI — each variant is genuinely unique.
                       </p>
                       <Button variant="ghost" size="sm" onClick={handleGenerate} className="text-xs gap-1">
                         <RefreshCw className="w-3.5 h-3.5" /> Regenerate
@@ -287,8 +297,8 @@ export default function OutreachGenerator() {
               {variants.length === 0 && !isGenerating && (
                 <div className="p-10 text-center border border-dashed rounded-xl bg-muted/10 text-muted-foreground">
                   <Sparkles className="w-10 h-10 mx-auto mb-3 opacity-20" />
-                  <h3 className="font-medium mb-1">Click Generate to get 3 unique messages</h3>
-                  <p className="text-sm">Each variant uses a different hook, angle, and CTA — pick the one that feels right.</p>
+                  <h3 className="font-medium mb-1">Click Generate to get 3 AI-written messages</h3>
+                  <p className="text-sm">Gemini AI writes each one from scratch — no templates, completely unique every time.</p>
                 </div>
               )}
             </TabsContent>
@@ -296,8 +306,8 @@ export default function OutreachGenerator() {
             <TabsContent value="followup" className="space-y-5">
               <Button onClick={handleGenerateSequence} disabled={isGeneratingSequence} className="w-full gap-2 h-12 text-base font-semibold">
                 {isGeneratingSequence
-                  ? <><RefreshCw className="w-4 h-4 animate-spin" /> Building Sequence...</>
-                  : <><ChevronRight className="w-4 h-4" /> Generate Full Follow-Up Sequence</>}
+                  ? <><RefreshCw className="w-4 h-4 animate-spin" /> AI Building Sequence...</>
+                  : <><ChevronRight className="w-4 h-4" /> Generate AI Follow-Up Sequence</>}
               </Button>
 
               {followUpSequence.length > 0 ? (
@@ -321,7 +331,7 @@ export default function OutreachGenerator() {
                             </Button>
                           </div>
                         </div>
-                        {formData.channel === 'email' && (
+                        {formData.channel === 'email' && msg.subject && (
                           <div className="mb-3 text-sm font-semibold border-b pb-2 text-muted-foreground">Subject: {msg.subject}</div>
                         )}
                         <Textarea
@@ -340,8 +350,8 @@ export default function OutreachGenerator() {
               ) : (
                 <div className="p-12 text-center border border-dashed rounded-xl bg-muted/10">
                   <Bot className="w-8 h-8 mx-auto text-muted-foreground mb-3 opacity-40" />
-                  <h3 className="font-medium text-lg mb-2">Smart follow-up on autopilot</h3>
-                  <p className="text-sm text-muted-foreground max-w-sm mx-auto">4 follow-up messages spaced over 30 days. Each one escalates just enough to stay top of mind without being pushy.</p>
+                  <h3 className="font-medium text-lg mb-2">AI-written follow-up sequence</h3>
+                  <p className="text-sm text-muted-foreground max-w-sm mx-auto">Gemini writes 4 follow-up messages at Days 3, 7, 14, and 21 — each with a different angle.</p>
                 </div>
               )}
             </TabsContent>

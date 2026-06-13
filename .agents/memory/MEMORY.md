@@ -1,0 +1,1 @@
+- [LeadHunter AI real-AI stack](leadhunter-ai-stack.md) — Gemini key goes via vite.config.ts define, not .env; all AI calls are client-side in src/lib/gemini.ts
